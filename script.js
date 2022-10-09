@@ -30,6 +30,9 @@ function oneRound(playerSelection,computerSelection) {
     let p = playerSelection.toLowerCase();
     let c = computerSelection.toLowerCase();
     let combine = p+c;
+    let displayTxt = `Your hand: ${p}`;
+    displayTxt += `<br>Computer's hand: ${c}`;
+    displayTxt += `<br>Result: `;
     let result = "";
     switch (combine) {
         case 'rockrock':
@@ -62,89 +65,72 @@ function oneRound(playerSelection,computerSelection) {
         default:
             result = 'ERROR!';
     }
+    displayTxt += result;
     
-    return result;
+    return {
+        "result": result,
+        "displayTxt": displayTxt,
+    }
 
 }
 
-//Write a function called game that plays 5 rounds of
-//the game, keep scores and report a winner or loser
-//at the end
+let btn1 = document.createElement('button');
+let btn2 = document.createElement('button');
+let btn3 = document.createElement('button');
+const btns = [btn1, btn2, btn3];
+let divResult = document.createElement('div');
+let roundCount = 0;
+let pScore = 0;
+let cScore = 0;
+let output;
 
-function game() {
-    let pScore = 0, cScore = 0;
-    for (let i = 1; i <= 5; i++) {
-        let hasSelected = false;
-        let playerSelection = "";
-        let output = "";
-        while (hasSelected!=true) {
-            let answer = prompt("Please choose Rock, Paper or Scissors:");
-            if (answer == null) {
-                return null;
-            } else {
-                playerSelection = answer.toLowerCase();
-                if (playerSelection == 'rock' || playerSelection == 'paper' || playerSelection == 'scissors') {
-                hasSelected = true;
-                }
-            }
+btn1.textContent = "Rock";
+btn2.textContent = "Paper";
+btn3.textContent = "Scissors";
+
+btns.forEach((btn) => {
+    document.body.appendChild(btn);
+})
+
+document.body.appendChild(divResult);
+
+btns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+        if (roundCount === 0) {
+            divResult.innerHTML = "";
         }
-        output = oneRound(playerSelection,getComputerChoice());
-        switch (output) {
+
+        roundCount++;
+        output = oneRound(btn.textContent,getComputerChoice());
+        switch (output.result) {
             case 'You win!':
                 pScore++;
-                console.log(`Game ${i}: You win!`);
                 break;
             case 'Computer wins!':
                 cScore++;
-                console.log(`Game ${i}: Computer wins!`);
                 break;
             case 'Draw!':
-                console.log(`Game ${i}: Draw!`);
                 break;
-            default:
-                console.log('ERROR!');
         }
-    }
-    let winner;
-    if (pScore > cScore) {
-        winner = 'You';
-    } else if (pScore < cScore) {
-        winner = 'Computer';
-    } else {
-        winner = 'No one'
-    }
-
-    return {
-        'winner':winner,
-        'pScore':pScore,
-        'cScore':cScore,
-        'draw': 5 - pScore - cScore
-    };
-}
-
-//Announce the overall result of the game
-let finalWinner = game();
-if (finalWinner !== null) {
-    console.log('The total score is:');
-    console.log(`Your score: ${finalWinner.pScore}`);
-    console.log(`Computer's score: ${finalWinner.cScore}`);
-    console.log(`Draw games: ${finalWinner.draw}`);
-
-    switch (finalWinner.winner) {
-        case 'You':
-            console.log('You have won the Grand Prize!');
-            break;
-        case 'Computer':
-            console.log('You will need some improvement!');
-            break;
-        case 'No one':
-            console.log('You almost made it. You should try again!');
-            break;
-        default:
-            console.log('ERROR!');
-    }
-}
-
+        divResult.innerHTML = divResult.innerHTML + "<br><br>Round: " + roundCount + "<br>" + output.displayTxt;
+        
+        if (roundCount === 5) {
+            divResult.innerHTML += `<br><br>Your final score: ${pScore}`;
+            divResult.innerHTML += `<br>Computer's final score: ${cScore}`;
+            if (pScore > cScore) {
+                divResult.innerHTML += '<h3>You are the final winner!</h3>';
+            } else if (pScore < cScore) {
+                divResult.innerHTML += '<h3>The computer is the final winner!</h3>';
+            } else {
+                divResult.innerHTML += '<h3>The overall game is a draw!</h3>';
+            }
+            roundCount = 0;
+            pScore = 0;
+            cScore = 0;
+            output = null;
+        }
+    });
+})
 
 
 
